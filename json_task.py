@@ -97,20 +97,25 @@ def create_and_fill_sheet(data: dict, wb: Workbook, name: str) -> None:
 
 def convert_jsons_to_xlsx() -> None:
     """
-    Создаёт xlsx файл и по данным из json'ов в текущей директории.
+    Основная функция запуска.
 
+    Создаёт xlsx файл и по данным из json'ов в текущей директории.
     Каждый json заполняет новый лист.
     """
-    wb = Workbook()
-    files = [file for file in os.listdir(".") if file.endswith(".json")]
-    for file in files:
-        with open(file, encoding="utf-8") as f:
-            data = json.load(f)
-            name = file.split(".")[0]
-            create_and_fill_sheet(data, wb, name)
+    try:
+        files = [file for file in os.listdir(".") if file.endswith(".json")]
+        if files:
+            wb = Workbook()
+            for file in files:
+                with open(file, encoding="utf-8") as f:
+                    data = json.load(f)
+                    name = file.split(".")[0]
+                    create_and_fill_sheet(data, wb, name)
 
-    del wb["Sheet"]
-    wb.save("converted.xlsx")
+            del wb["Sheet"]
+            wb.save("converted.xlsx")
+    except KeyError:
+        print("Проверьте целостность файлов")
 
 
 if __name__ == "__main__":
