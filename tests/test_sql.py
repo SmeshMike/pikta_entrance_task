@@ -35,6 +35,7 @@ def test_fill_db(users_input, products_input, orders_input):
         orders_count = int(*cursor.fetchone())
         assert orders_count == len(orders_input)
 
+
 @pytest.mark.parametrize(
     "users_input,products_input,orders_input",
     [
@@ -51,7 +52,7 @@ def test_return_clients_with_purchases_sum(users_input, products_input, orders_i
         cursor = connection.cursor()
         st.fill_db(users_input, products_input, orders_input, cursor)
         clients = st.return_clients_with_purchases_sum(cursor)
-        for i,v in enumerate(clients):
+        for i, v in enumerate(clients):
             assert v[0] == users_input[i][0]
             assert v[1] == products_input[i][1]
 
