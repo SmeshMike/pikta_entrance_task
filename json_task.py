@@ -128,4 +128,4 @@ def convert_jsons_to_xlsx(files: list[str], name: str) -> None:
 
 if __name__ == "__main__":
     files = [file for file in os.listdir(".") if file.endswith(".json")]
-    convert_jsons_to_xlsx(files, "kek")
+    convert_jsons_to_xlsx(files, "MyFile")

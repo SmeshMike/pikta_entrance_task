@@ -1,9 +1,8 @@
 import os
 import sys
-from unittest.mock import MagicMock, mock_open, patch
 
 import pytest
-from openpyxl import Workbook, load_workbook
+from openpyxl import Workbook
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(SCRIPT_DIR, ".."))
