@@ -127,3 +127,14 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+#pre-commit settings
+.flake8
+.pre-commit-config.yaml
+.pydocstyle
+
+# Excel files
+*.xlsx
+
+# VSCode stash
+.vscode/
