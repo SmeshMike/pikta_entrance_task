@@ -7,8 +7,10 @@ from openpyxl.styles.borders import Border, Side
 from openpyxl.utils import get_column_letter
 from openpyxl.worksheet.worksheet import Worksheet
 
+import logger as lg
 
-def find_shape_from_json(data: dict) -> int:
+
+def find_shape_of_data(data: dict) -> int:
     """
     Находит число заголовков по количеству элементов в header из переданного json.
 
@@ -19,9 +21,12 @@ def find_shape_from_json(data: dict) -> int:
     return x
 
 
-def align_data_json(data: dict) -> tuple[dict]:
+def align_data(data: dict) -> tuple[dict]:
     """
-    Переформировывает переданный json файл, совмещая данные из заголовка и значений.
+    Переформировывает переданный json файл, совмещая данные из заголовка и значений, сортируя по X и Y.
+
+    Первые N элементов будут соответствовать заголовку, а все последующие комплекты из N элементов будут
+    соответствовать последующим строкам значений.
 
     :param data: словарь полученный из json
     :returns: tuple из dict'ов всех значений из изначального json
@@ -59,7 +64,7 @@ def fill_worksheet_values(start: int, data: tuple[dict], field: str, ws: Workshe
     """
     for i in range(0, len(data)):
         value = data[i][field]
-        if value[-1] == "-":
+        if isinstance(value, str) and value[-1] == "-":
             value = "-" + value[: (len(value) - 1)]
         ws.cell(row=i // start + 2, column=i % start + 1, value=value)
 
@@ -78,45 +83,49 @@ def add_borders_to_cells(ws: Worksheet) -> None:
             cell.border = thin_border
 
 
-def create_and_fill_sheet(data: dict, wb: Workbook, name: str) -> None:
+def create_and_fill_sheet(data: dict, wb: Workbook, sheet_name: str) -> None:
     """
     Создаёт, заполняет и сохраняет xlsx файл по переданному словарю в директорию файла.
 
-    :param data: словарий значений
+    :param data: словарь значений для записи
     :param wb: рабочая книга
-    :param name: имя файла для сохранения
+    :param sheet_name: имя листа для сохранения
     """
-    ws = wb.create_sheet(name)
-    elements = align_data_json(data)
-    x = find_shape_from_json(data)
+    ws = wb.create_sheet(sheet_name)
+    elements = align_data(data)
+    x = find_shape_of_data(data)
 
     fill_worksheet_header(x, elements[:x], "QuickInfo", ws)
     fill_worksheet_values(x, elements[x:], "Text", ws)
     add_borders_to_cells(ws)
 
 
-def convert_jsons_to_xlsx() -> None:
+def convert_jsons_to_xlsx(files: list[str], name: str) -> None:
     """
     Основная функция запуска.
 
     Создаёт xlsx файл и по данным из json'ов в текущей директории.
     Каждый json заполняет новый лист.
+
+    :param files: словарий значений
     """
     try:
-        files = [file for file in os.listdir(".") if file.endswith(".json")]
         if files:
             wb = Workbook()
+            logger = lg.get_logger()
             for file in files:
                 with open(file, encoding="utf-8") as f:
                     data = json.load(f)
-                    name = file.split(".")[0]
-                    create_and_fill_sheet(data, wb, name)
+                    sheet_name = file.split(".")[0]
+                    create_and_fill_sheet(data, wb, sheet_name)
 
             del wb["Sheet"]
-            wb.save("converted.xlsx")
+            wb.save(f"{name}.xlsx")
+            logger.info("Файл успешно сохранён")
     except KeyError:
-        print("Проверьте целостность файлов")
+        logger.info("Проверьте целостность файлов")
 
 
 if __name__ == "__main__":
-    convert_jsons_to_xlsx()
+    files = [file for file in os.listdir(".") if file.endswith(".json")]
+    convert_jsons_to_xlsx(files, "kek")
