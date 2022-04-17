@@ -109,23 +109,23 @@ def convert_jsons_to_xlsx(files: list[str], name: str) -> None:
 
     :param files: словарий значений
     """
-    try:
-        if files:
-            wb = Workbook()
-            logger = lg.get_logger()
-            for file in files:
+    if files:
+        for file in files:
+            try:
+                wb = Workbook()
+                logger = lg.get_logger()
                 with open(file, encoding="utf-8") as f:
                     data = json.load(f)
                     sheet_name = file.split(".")[0]
                     create_and_fill_sheet(data, wb, sheet_name)
 
-            del wb["Sheet"]
-            wb.save(f"{name}.xlsx")
-            logger.info("Файл успешно сохранён")
-    except KeyError:
-        logger.info("Проверьте целостность файлов")
+                del wb["Sheet"]
+                wb.save(f"{name}.xlsx")
+                logger.info("Файл успешно сохранён")
+            except KeyError:
+                logger.info(f"Проверьте целостность файла {file}")
 
 
 if __name__ == "__main__":
     files = [file for file in os.listdir(".") if file.endswith(".json")]
-    convert_jsons_to_xlsx(files, "kek")
+    convert_jsons_to_xlsx(files, "MyFile")
