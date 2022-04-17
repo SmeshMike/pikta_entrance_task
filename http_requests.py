@@ -3,6 +3,8 @@ import json
 
 import requests
 
+import logger as lg
+
 
 def get_payment_details(ifns: int, oktmmf: int) -> dict:
     """Получает данные платёжных реквизитов по введённым коду ИФНС и муниципальному образованию с сайта ФНС РФ."""
@@ -33,10 +35,11 @@ def get_cmd_args() -> str:
 
 if __name__ == "__main__":
     try:
+        logger = lg.get_logger()
         args = get_cmd_args()
         res = get_payment_details(args.ifns, args.oktmmf)
-        print(res)
+        logger.info(res)
     except requests.exceptions.Timeout:
-        print("Время ожидания ответа от сервера истекло")
+        logger.info("Время ожидания ответа от сервера истекло")
     except requests.exceptions.RequestException as e:
-        print(str(e))
+        logger.info(str(e))
